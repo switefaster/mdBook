@@ -259,6 +259,8 @@ window.search = window.search || {};
         doc_urls = config.doc_urls;
         searchindex = elasticlunr.Index.load(config.index);
 
+        elasticlunr.zh && searchindex.use(elasticlunr.zh);
+
         // Set up events
         searchicon.addEventListener('click', function(e) { searchIconClickHandler(); }, false);
         searchbar.addEventListener('keyup', function(e) { searchbarKeyUpHandler(); }, false);

@@ -745,6 +745,12 @@ fn make_data(
             "search_js".to_owned(),
             json!(search.enable && search.copy_js),
         );
+        if cfg!(feature = "zh") {
+            data.insert(
+                "zh_search".to_owned(),
+                json!(search.enable && search.copy_js),
+            );
+        }
     } else if search.is_some() {
         warn!("mdBook compiled without search support, ignoring `output.html.search` table");
         warn!(

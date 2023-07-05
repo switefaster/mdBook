@@ -303,8 +303,14 @@
 
         {{#if search_js}}
         <script src="{{ path_to_root }}elasticlunr.min.js"></script>
+        {{#if zh_search}}
+        <script src="{{ path_to_root }}lunr.stemmer.support.js"></script>
+        <script src="{{ path_to_root }}lunr.zh.js" type="module"></script>
+        {{/if}}
         <script src="{{ path_to_root }}mark.min.js"></script>
+        {{#unless zh_search}}
         <script src="{{ path_to_root }}searcher.js"></script>
+        {{/unless}}
         {{/if}}
 
         <script src="{{ path_to_root }}clipboard.min.js"></script>

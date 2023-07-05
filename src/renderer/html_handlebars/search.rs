@@ -9,6 +9,8 @@ use pulldown_cmark::*;
 use crate::book::{Book, BookItem};
 use crate::config::Search;
 use crate::errors::*;
+#[cfg(feature = "zh")]
+use crate::renderer::html_handlebars::zh::Chinese;
 use crate::theme::searcher;
 use crate::utils;
 use log::{debug, warn};
@@ -27,7 +29,15 @@ fn tokenize(text: &str) -> Vec<String> {
 
 /// Creates all files required for search.
 pub fn create_files(search_config: &Search, destination: &Path, book: &Book) -> Result<()> {
+    #[cfg(not(feature = "zh"))]
     let mut index = IndexBuilder::new()
+        .add_field_with_tokenizer("title", Box::new(&tokenize))
+        .add_field_with_tokenizer("body", Box::new(&tokenize))
+        .add_field_with_tokenizer("breadcrumbs", Box::new(&tokenize))
+        .build();
+
+    #[cfg(feature = "zh")]
+    let mut index = IndexBuilder::with_language(Box::new(Chinese::new()))
         .add_field_with_tokenizer("title", Box::new(&tokenize))
         .add_field_with_tokenizer("body", Box::new(&tokenize))
         .add_field_with_tokenizer("breadcrumbs", Box::new(&tokenize))
@@ -55,6 +65,17 @@ pub fn create_files(search_config: &Search, destination: &Path, book: &Book) -> 
         utils::fs::write_file(destination, "searcher.js", searcher::JS)?;
         utils::fs::write_file(destination, "mark.min.js", searcher::MARK_JS)?;
         utils::fs::write_file(destination, "elasticlunr.min.js", searcher::ELASTICLUNR_JS)?;
+        #[cfg(feature = "zh")]
+        {
+            utils::fs::write_file(destination, "lunr.zh.js", searcher::LUNR_ZH_JS)?;
+            utils::fs::write_file(
+                destination,
+                "lunr.stemmer.support.js",
+                searcher::LUNR_STEMMER_SUPPORT_JS,
+            )?;
+            utils::fs::write_file(destination, "jieba_rs_wasm.js", searcher::JIEBA_WASM_JS)?;
+            utils::fs::write_file(destination, "jieba_rs_wasm_bg.wasm", searcher::JIEBA_WASM)?;
+        }
         debug!("Copying search files ✓");
     }
 

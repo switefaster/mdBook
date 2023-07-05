@@ -7,3 +7,5 @@ mod helpers;
 
 #[cfg(feature = "search")]
 mod search;
+#[cfg(feature = "zh")]
+mod zh;
