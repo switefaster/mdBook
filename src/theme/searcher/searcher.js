@@ -1,6 +1,6 @@
 "use strict";
 window.search = window.search || {};
-(function search(search) {
+(function search(search, cut) {
     // Search functionality
     //
     // You can use !hasFocus() to prevent keyhandling in your key
@@ -172,16 +172,16 @@ window.search = window.search || {};
         var searchterm_weight = 40;
         var weighted = []; // contains elements of ["word", weight, index_in_document]
         // split in sentences, then words
-        var sentences = body.toLowerCase().split('. ');
+        var sentences = elasticlunr.zh ? body.toLowerCase().split(/[.。?？!！\n]/) : body.toLowerCase().split('. ');
         var index = 0;
         var value = 0;
         var searchterm_found = false;
         for (var sentenceindex in sentences) {
-            var words = sentences[sentenceindex].split(' ');
+            var words = cut ? cut(sentences[sentenceindex], false) : sentences[sentenceindex].split(' ');
             value = 8;
             for (var wordindex in words) {
                 var word = words[wordindex];
-                if (word.length > 0) {
+                if (word.length > 0 && (elasticlunr.zh ? word.trim() !== "" : true)) {
                     for (var searchtermindex in stemmed_searchterms) {
                         if (elasticlunr.stemmer(word).startsWith(stemmed_searchterms[searchtermindex])) {
                             value = searchterm_weight;
@@ -192,7 +192,7 @@ window.search = window.search || {};
                     value = 2;
                 }
                 index += word.length;
-                index += 1; // ' ' or '.' if last word in sentence
+                elasticlunr.zh || (index += 1); // ' ' or '.' if last word in sentence
             };
             index += 1; // because we split at a two-char boundary '. '
         };
@@ -458,7 +458,7 @@ window.search = window.search || {};
         searchresults_header.innerText = formatSearchMetric(resultcount, searchterm);
 
         // Clear and insert results
-        var searchterms  = searchterm.split(' ');
+        var searchterms  = elasticlunr.zh ? cut(searchterm, false) : searchterm.split(' ');
         removeChildren(searchresults);
         for(var i = 0; i < resultcount ; i++){
             var resultElem = document.createElement('li');
@@ -482,4 +482,4 @@ window.search = window.search || {};
 
     // Exported functions
     search.hasFocus = hasFocus;
-})(window.search);
+})(window.search, window.cut);

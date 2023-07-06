@@ -34,10 +34,11 @@
   } else {
     // Browser globals (root is window)
     const {
-      default: init, cut_for_search
+      default: init, cut
     } = await import('./jieba_rs_wasm.js');
     await init();
-    factory(cut_for_search)(root.lunr);
+    factory(cut)(root.lunr);
+    root.cut = cut;
     await import('./searcher.js');
   }
 }(globalThis, function (cut) {

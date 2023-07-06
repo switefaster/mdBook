@@ -24,7 +24,7 @@ impl Language for Chinese {
 
     fn tokenize(&self, text: &str) -> Vec<String> {
         self.jieba
-            .cut_for_search(text, false)
+            .cut(text.to_lowercase().as_str(), false)
             .iter()
             .map(|s| s.to_string())
             .collect()
