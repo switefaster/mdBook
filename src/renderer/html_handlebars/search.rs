@@ -16,8 +16,10 @@ use crate::utils;
 use log::{debug, warn};
 use serde::Serialize;
 
+#[cfg(not(feature = "zh"))]
 const MAX_WORD_LENGTH_TO_INDEX: usize = 80;
 
+#[cfg(not(feature = "zh"))]
 /// Tokenizes in the same way as elasticlunr-rs (for English), but also drops long tokens.
 fn tokenize(text: &str) -> Vec<String> {
     text.split(|c: char| c.is_whitespace() || c == '-')
@@ -38,9 +40,9 @@ pub fn create_files(search_config: &Search, destination: &Path, book: &Book) -> 
 
     #[cfg(feature = "zh")]
     let mut index = IndexBuilder::with_language(Box::new(Chinese::new()))
-        .add_field_with_tokenizer("title", Box::new(&tokenize))
-        .add_field_with_tokenizer("body", Box::new(&tokenize))
-        .add_field_with_tokenizer("breadcrumbs", Box::new(&tokenize))
+        .add_field("title")
+        .add_field("body")
+        .add_field("breadcrumbs")
         .build();
 
     let mut doc_urls = Vec::with_capacity(book.sections.len());
